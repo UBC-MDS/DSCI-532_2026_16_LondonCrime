@@ -40,6 +40,7 @@ User Stories:
 
 ## Section 4: Exploratory Data Analysis
 
+<<<<<<< HEAD
 #### [Heat Map Visualization:]{.underline}
 
 -   With the use of the heat map, users can easily hover over their desired borough and check the number or crime rates. This heat map is especially useful for users that are looking for a specific neighborhood/borough and the number of crimes, and the type of crime that took place there. The heat map could be a useful visualization for the lawyer, checking the for the median number of crimes in Barnet.
@@ -53,3 +54,6 @@ User Stories:
 - With our dashboard, our team ensured easy access to the most thorough information about crimes taking place in London. We made sure to highlight the most important information, including total crimes, crime rate per 1,000 people, most common type of crime, and the safest borough. With these quick numbers, users can easily get a general understanding of the crimes taking place in London and how they might impact them on a day-to-day basis. Furthermore, we included graphs that showcase these insights in a more comprehensive manner. As seen, we have created dummy graphs that showcase annual crimes, types of crimes and their frequency, along with crime trends over the past several years. We have also included a heat map that showcases each specific borough and the frequency of each crime in that borough. If users wish to select a specific year, crime type, or borough, we have included a global selector at the top of the dashboard that allows them to choose their desired specifications.
 
 ![Sketch](../img/sketch.png)
+=======
+## Section 5: App Sketch & Description
+>>>>>>> origin
