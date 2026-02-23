@@ -63,7 +63,6 @@ app_ui = ui.page_fillable(
         ui.value_box("Most Common Crime", ui.p("most common type of crime")),
         ui.value_box("Lowest Crime Borough", ui.p("borough with the lowest number of crimes total")),
         fill=False,
-    )
     ),
     ui.layout_columns(
         ui.card(
@@ -93,6 +92,7 @@ app_ui = ui.page_fillable(
         ui.p("list of most recent incidents"),
         full_screen=True,
         ),
+    ),
     ),
 )
 
