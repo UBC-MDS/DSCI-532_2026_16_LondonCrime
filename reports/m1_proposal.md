@@ -40,7 +40,7 @@ User Stories:
 
 ## Section 4: Exploratory Data Analysis
 
-EDA was performed in the [eda_analysis.ipynb]((https://github.com/UBC-MDS/DSCI-532_2026_16_LondonCrime/blob/main/notebooks/eda_analysis.ipynb)) notebook.
+EDA was performed in the [eda_analysis.ipynb](https://github.com/UBC-MDS/DSCI-532_2026_16_LondonCrime/blob/main/notebooks/eda_analysis.ipynb) notebook.
 
 #### Heat Map Visualization
 
