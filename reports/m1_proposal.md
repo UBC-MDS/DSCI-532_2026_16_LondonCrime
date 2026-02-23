@@ -38,7 +38,7 @@ User Stories:
 
 -   I work at a law firm, and our client was robbed of his possessions in Barnet, a borough in London. The defense argues that no crimes have occurred in that borough for the past two years. Using this dashboard, we can quickly validate or disprove this claim.
 
-## Section 4: Exploratory Data Analysis
+## Section 4: [Exploratory Data Analysis](https://github.com/UBC-MDS/DSCI-532_2026_16_LondonCrime/blob/main/notebooks/eda_analysis.ipynb)
 
 #### [Heat Map Visualization:]{.underline}
 
