@@ -4,6 +4,12 @@ An interactive dashboard to explore crime data in London. Filter by year and cri
 
 ---
 
+**Stable Posit Cloud link:**
+https://019c8cf1-a288-5cee-f1a1-893bc0f9414c.share.connect.posit.cloud
+
+**Preview Posit Cloud link:**
+https://019c8cf5-07e1-aea6-bf22-33e39990085b.share.connect.posit.cloud
+
 ## Getting the Dashboard Running Locally
 
 ### Prerequisites
