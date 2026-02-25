@@ -47,7 +47,7 @@ app_ui = ui.page_fillable(
                 choices=boroughs,
                 multiple=True,  
             ),  
-            ui.input_action_button("reset_filter", "Reset filter"),
+            ui.input_action_button("reset_filter", "Clear Filters"),
             open="desktop",
         ),
     ui.layout_columns(
@@ -194,18 +194,51 @@ def server(input, output, session):
         if df.empty:
             return px.line(title="No data available")
         
-        df_grouped = df.groupby(["year", "month", "borough"]).size().reset_index(name="count")
-        df_grouped["date"] = pd.to_datetime(df_grouped[["year", "month"]].assign(day=1))
+        df_grouped = df.groupby(["borough", "major_category"]).size().reset_index(name="count")
+        df_grouped = df_grouped.sort_values("count", ascending=False)
         
-        fig = px.line(
+        fig = px.bar(
             df_grouped,
-            x="date",
+            x="borough",
             y="count",
-            color="borough",
-            title="Amount of Crime by Borough Over Time",
-            labels={"date": "Date", "count": "Number of Crimes", "borough": "Borough"},
+            color="major_category",
+            barmode="stack",
+            title="Amount of Crime by Borough and Type",
+            labels={"borough": "Borough", "count": "Number of Crimes", "major_category": "Crime Type"},
         )
         return fig
+        
+    # @render_plotly
+    # def borough_trend():
+    #     df = filtered_data()
+    #     if df.empty:
+    #         return px.line(title="No data available")
+        
+    #     df_grouped = df.groupby(["year", "borough"]).size().reset_index(name="count")
+    #     df_avg = df_grouped.groupby("borough")["count"].mean().reset_index(name="avg_count")
+    #     df_avg = df_avg.sort_values("avg_count", ascending=False)
+        
+    #     fig = px.bar(
+    #         df_avg,
+    #         x="borough",
+    #         y="avg_count",
+    #         title="Average Crimes per Year by Borough",
+    #         labels={"borough": "Borough", "avg_count": "Average Crimes per Year"},
+    #     )
+    #     return fig
+        
+        # df_grouped = df.groupby(["year", "month", "borough"]).size().reset_index(name="count")
+        # df_grouped["date"] = pd.to_datetime(df_grouped[["year", "month"]].assign(day=1))
+        
+        # fig = px.line(
+        #     df_grouped,
+        #     x="date",
+        #     y="count",
+        #     color="borough",
+        #     title="Amount of Crime by Borough Over Time",
+        #     labels={"date": "Date", "count": "Number of Crimes", "borough": "Borough"},
+        # )
+        # return fig
     
     @render_plotly
     def crime_type_trend():
