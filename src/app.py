@@ -7,49 +7,94 @@ import pandas as pd
 
 data = pd.read_csv("data/raw/LondonCrimeData.csv")
 
-boroughs = sorted(['Barking and Dagenham', 'Waltham Forest', 'Tower Hamlets', 'Sutton', 'Southwark', 'Richmond upon Thames', 'Redbridge', 'Newham', 'Merton', 'Lewisham', 'Lambeth', 'Kingston upon Thames', 'Kensington and Chelsea', 'Islington', 'Hounslow', 'Wandsworth', 'Hillingdon', 'Harrow', 'Haringey', 'Hammersmith and Fulham', 'Hackney', 'Greenwich', 'Enfield', 'Ealing', 'Croydon', 'City of London', 'Camden', 'Bromley', 'Brent', 'Bexley', 'Barnet', 'Havering', 'Westminster'])
+BOROUGHS = sorted(['Barking and Dagenham', 'Waltham Forest', 'Tower Hamlets', 'Sutton', 'Southwark', 'Richmond upon Thames', 'Redbridge', 'Newham', 'Merton', 'Lewisham', 'Lambeth', 'Kingston upon Thames', 'Kensington and Chelsea', 'Islington', 'Hounslow', 'Wandsworth', 'Hillingdon', 'Harrow', 'Haringey', 'Hammersmith and Fulham', 'Hackney', 'Greenwich', 'Enfield', 'Ealing', 'Croydon', 'City of London', 'Camden', 'Bromley', 'Brent', 'Bexley', 'Barnet', 'Havering', 'Westminster'])
+
+CRIME_TYPES = [
+    "Theft and Handling",
+    "Criminal Damage",
+    "Robbery",
+    "Drugs",
+    "Violence Against the Person",
+    "Other Notifiable Offences",
+]
+
+# Asked Claude to generate a color palette dictionary for the 6 crime types
+# and to create CSS code to ensure instances (plots, text boxes) use the same colorings.
+CRIME_COLORS = {
+    "Theft and Handling":          "#4E79A7",
+    "Criminal Damage":             "#F28E2B",
+    "Robbery":                     "#E15759",
+    "Drugs":                       "#76B7B2",
+    "Violence Against the Person": "#59A14F",
+    "Other Notifiable Offences":   "#B07AA1",
+}
+# CSS block that maps each crime type to its color for value box highlight, obtained from Claude (see above).
+CRIME_CSS = "\n".join(
+    f'.crime-color-{i} {{ color: {color} !important; font-weight: bold; }}'
+    for i, color in enumerate(CRIME_COLORS.values())
+)
+CRIME_COLOR_INDEX = {name: i for i, name in enumerate(CRIME_COLORS.keys())}
 
 app_ui = ui.page_fillable(
     ui.panel_title("Crime in London"),
-    ui.tags.style("""
-        #total_crimes { font-size: 2rem; font-weight: bold; }
-        #crime_rate { font-size: 2rem; font-weight: bold; }
-        #most_common_crime { font-size: 2rem; font-weight: bold; }
-        #lowest_crime_borough { font-size: 2rem; font-weight: bold; }
-        #year_label_1, #year_label_2, #year_label_3, #year_label_4 { font-size: 0.8rem; opacity: 0.7; }
+    # Asked Claude for CSS styling to make the year labels smaller and the numbers larger in the text boxes.
+    ui.tags.style(f"""
+        #total_crimes {{ font-size: 2rem; font-weight: bold; }}
+        #crime_rate {{ font-size: 2rem; font-weight: bold; }}
+        #most_common_crime {{ font-size: 2rem; font-weight: bold; }}
+        #lowest_crime_borough {{ font-size: 2rem; font-weight: bold; }}
+        #year_label_1, #year_label_2, #year_label_3, #year_label_4 {{ font-size: 0.8rem; opacity: 0.7; }}
+        {CRIME_CSS}
     """),
+    # Create sidebar
     ui.layout_sidebar(
         ui.sidebar(
-            ui.input_slider("year_range", "Year Range", min=data.year.min(), max=data.year.max(), value=[data.year.min(), data.year.max()], sep=""),
-            ui.input_checkbox_group(
-                id="major_category",
-                label="Crime Types",
-                choices=[
-                    "Theft and Handling",
-                    "Criminal Damage",
-                    "Robbery",
-                    "Drugs",
-                    "Violence Against the Person",
-                    "Other Notifiable Offences"
-                ],
-                selected=[
-                    "Theft and Handling",
-                    "Criminal Damage",
-                    "Robbery",
-                    "Drugs",
-                    "Violence Against the Person",
-                    "Other Notifiable Offences"
-                ],
+            # Year Selector
+            ui.input_slider("year_range", 
+                            "Year Range", 
+                            min=data.year.min(), 
+                            max=data.year.max(), 
+                            value=[data.year.min(), data.year.max()], sep=""
+                            ),
+            # Crime Type Checkbox with Custom Coloring
+            ui.tags.div(
+                ui.tags.label("Crime Types", style="font-weight: bold; display: block; margin-bottom: 0.5rem;"),
+                # Asked Claude to generate the code to color the checkboxes to match the global crime type colors dictionary. Copied code from Claude and replaced placeholder values (such as name).
+                ui.tags.div(
+                    *[
+                        ui.tags.div(
+                            ui.tags.input(
+                                type="checkbox",
+                                name="major_category",
+                                value=crime,
+                                checked="checked",
+                                id=f"major_category_{i}",
+                                style=f"margin-right: 0.4rem; accent-color: {CRIME_COLORS[crime]}; color: white;",
+                            ),
+                            ui.tags.label(
+                                crime,
+                                **{"for": f"major_category_{i}"},
+                                style=f"color: {CRIME_COLORS[crime]}; font-weight: 600; cursor: pointer;",
+                            ),
+                            style="display: flex; align-items: center; margin-bottom: 0.3rem;",
+                        )
+                        for i, crime in enumerate(CRIME_TYPES)
+                    ],
+                    id="major_category",
+                    class_="shiny-input-checkboxgroup",
+                ),
             ),
+            # Borough Multi-Selector with Searching
             ui.input_selectize(  
                 "borough",  
                 "Select Borough(s):",
-                choices=boroughs,
+                choices=BOROUGHS,
                 multiple=True,  
             ),  
             ui.input_action_button("reset_filter", "Clear Filters"),
             open="desktop",
         ),
+    # Summary Info Text Boxes
     ui.layout_columns(
         ui.value_box(
             "Total Crimes in London", 
@@ -62,48 +107,78 @@ app_ui = ui.page_fillable(
             ui.output_text("crime_rate")
             ),
         ui.value_box(
-            "Most Common Crime in London", 
-            ui.output_text("year_label_3"), 
-            ui.output_text("most_common_crime")
+            "Crime by Type in London",
+            ui.output_text("year_label_3"),
+            ui.tags.div(
+                ui.tags.div(
+                    ui.tags.span("Most Common: ", style="font-size:0.85rem; opacity:0.7;"),
+                    ui.output_ui("most_common_crime"),
+                ),
+                ui.tags.div(
+                    ui.tags.span("Least Common: ", style="font-size:0.85rem; opacity:0.7;"),
+                    ui.output_ui("least_common_crime"),
+                ),
             ),
+        ),
         ui.value_box(
-            "Lowest Crime Borough in London", 
-            ui.output_text("year_label_4"), 
-            ui.output_text("lowest_crime_borough")
+            "Crime by Borough in London",
+            ui.output_text("year_label_4"),
+            ui.tags.div(
+                ui.tags.div(
+                    ui.tags.span("Highest: ", style="font-size:0.85rem; opacity:0.7;"),
+                    ui.output_text("highest_crime_borough"),
+                ),
+                ui.tags.div(
+                    ui.tags.span("Lowest: ", style="font-size:0.85rem; opacity:0.7;"),
+                    ui.output_text("lowest_crime_borough"),
+                ),
             ),
+        ),
         fill=False,
     ),
+    # Plots
     ui.layout_columns(
         ui.card(
-            ui.card_header("Amount of Crime - Borough Trend Comparison"),
+            # ui.card_header("Amount of Crime - Borough Trend Comparison"),
             output_widget("borough_trend"),
             full_screen=True,
         ),
         ui.card(
-            ui.card_header("Amount of Crime by Type"),
+            # ui.card_header("Amount of Crime by Type"),
             output_widget("crime_type_counts"),
             full_screen=True,
         ),
         ui.card(
-            ui.card_header("Amount of Crime - Type Trend Comparison"),
+            # ui.card_header("Amount of Crime - Type Trend Comparison"),
             output_widget("crime_type_trend"),
             full_screen=True,
         ),
     ),
     ui.layout_columns(
         ui.card(
-            ui.card_header("Crime Heatmap by Borough and Month"),
-            output_widget("crime_heatmap"),     
+            # ui.card_header("Crime Heatmap by Borough and Month"),
+            output_widget("crime_type_month_heatmap"),     
             full_screen=True,
         ),
         ui.card(
-            ui.card_header("Recent Incidents"),
-            ui.p("list of most recent incidents"),
+            # ui.card_header("Recent Incidents"),
+            output_widget("borough_month_heatmap"),
             full_screen=True,
         ),
     ),
     ),
 )
+
+# Code provided by Claude to ensure every plot has the same ordering of colors for the different crime types, created in conjunction with the CRIME_COLORS dictionary and CRIME_CSS.
+def apply_crime_colors(fig, color_col="major_category"):
+    """Update traces so each crime type uses the consistent palette."""
+    for trace in fig.data:
+        name = trace.name
+        if name in CRIME_COLORS:
+            trace.marker.color = CRIME_COLORS[name]
+            if hasattr(trace, "line"):
+                trace.line.color = CRIME_COLORS[name]
+    return fig
 
 def server(input, output, session):
     @reactive.calc
@@ -130,41 +205,53 @@ def server(input, output, session):
     
     @render.text
     def total_crimes():
-        # df = filtered_data()
-        # if df.empty:
-        #     return "No Data"
-        # return str(df.shape[0])
+        df = filtered_data_year()
+        if df.empty:
+            return "No Data"
         return str(filtered_data_year().shape[0])
 
-    
-    @render.text
+    # Asked Claude to color the text entry by the associated global crime type color.
+    @render.ui
     def most_common_crime():
-        # df = filtered_data()
-        # if df.empty:
-        #     return "No Data"
-        # return str(df.major_category.value_counts().idxmax())
-        return str(filtered_data_year().major_category.value_counts().idxmax())
+        df = filtered_data_year()
+        if df.empty:
+            return "No Data"
+        crime = str(filtered_data_year().major_category.value_counts().idxmax())
+        idx = CRIME_COLOR_INDEX.get(crime, 0)
+        return ui.tags.span(crime, class_=f"crime-color-{idx}")
 
-    
+    @render.ui
+    def least_common_crime():
+        df = filtered_data_year()
+        if df.empty:
+            return ui.tags.span("No Data")
+        crime = str(df.major_category.value_counts().idxmin())
+        idx = CRIME_COLOR_INDEX.get(crime, 0)
+        return ui.tags.span(crime, class_=f"crime-color-{idx}")
+
+    @render.text
+    def highest_crime_borough():
+        df = filtered_data_year()
+        if df.empty:
+            return "No Data"
+        return str(df.borough.value_counts().idxmax())
+
     @render.text
     def lowest_crime_borough():
-        # df = filtered_data()
-        # if df.empty:
-        #     return "No Data"
-        # return str(df.borough.value_counts().idxmin())
+        df = filtered_data_year()
+        if df.empty:
+            return "No Data"
         return str(filtered_data_year().borough.value_counts().idxmin())
     
     @render.text
     def crime_rate():
-        # df = filtered_data()
-        # if df.empty:
-        #     return "No data"
-        # monthly_crimes = df.groupby(["year", "month"]).size()
-        # return str(round(monthly_crimes.mean()))
-    
+        df = filtered_data_year()
+        if df.empty:
+            return "No Data"
         monthly_crimes = filtered_data_year().groupby(["year", "month"]).size()
         return str(round(monthly_crimes.mean()))
     
+    # Create a function for calculating the year label
     def year_label():
         start, end = input.year_range()
         if start == end:
@@ -172,6 +259,7 @@ def server(input, output, session):
         else:
             return f"{start} - {end}"
     
+    # Need to have 4 seperate functions for the 4 separate cards: when I try to do all 4 with the same function it gives me errors about duplicates.
     @render.text
     def year_label_1():
         return year_label()
@@ -188,6 +276,7 @@ def server(input, output, session):
     def year_label_4():
         return year_label()
     
+    # Borough trend plot
     @render_plotly
     def borough_trend():
         df = filtered_data()
@@ -205,41 +294,11 @@ def server(input, output, session):
             barmode="stack",
             title="Amount of Crime by Borough and Type",
             labels={"borough": "Borough", "count": "Number of Crimes", "major_category": "Crime Type"},
+            color_discrete_map=CRIME_COLORS,
         )
         return fig
-        
-    # @render_plotly
-    # def borough_trend():
-    #     df = filtered_data()
-    #     if df.empty:
-    #         return px.line(title="No data available")
-        
-    #     df_grouped = df.groupby(["year", "borough"]).size().reset_index(name="count")
-    #     df_avg = df_grouped.groupby("borough")["count"].mean().reset_index(name="avg_count")
-    #     df_avg = df_avg.sort_values("avg_count", ascending=False)
-        
-    #     fig = px.bar(
-    #         df_avg,
-    #         x="borough",
-    #         y="avg_count",
-    #         title="Average Crimes per Year by Borough",
-    #         labels={"borough": "Borough", "avg_count": "Average Crimes per Year"},
-    #     )
-    #     return fig
-        
-        # df_grouped = df.groupby(["year", "month", "borough"]).size().reset_index(name="count")
-        # df_grouped["date"] = pd.to_datetime(df_grouped[["year", "month"]].assign(day=1))
-        
-        # fig = px.line(
-        #     df_grouped,
-        #     x="date",
-        #     y="count",
-        #     color="borough",
-        #     title="Amount of Crime by Borough Over Time",
-        #     labels={"date": "Date", "count": "Number of Crimes", "borough": "Borough"},
-        # )
-        # return fig
     
+    # Crime type trend plot
     @render_plotly
     def crime_type_trend():
         df = filtered_data()
@@ -256,9 +315,11 @@ def server(input, output, session):
             color="major_category",
             title="Amount of Crime by Type Over Time",
             labels={"date": "Date", "count": "Number of Crimes", "major_category": "Crime Type"},
+            color_discrete_map=CRIME_COLORS,
         )
         return fig
 
+    # Crime type counts plot
     @render_plotly
     def crime_type_counts():
         df = filtered_data()
@@ -276,26 +337,50 @@ def server(input, output, session):
             barmode="group",
             title="Amount of Crime by Type Per Year",
             labels={"year": "Year", "count": "Number of Crimes", "major_category": "Crime Type"},
+            color_discrete_map=CRIME_COLORS,
         )
         return fig
     
+    # Crime type v. month
     @render_plotly
-    def crime_heatmap():
+    def crime_type_month_heatmap():
         df = filtered_data()
         if df.empty:
             return px.bar(title="No data available")
-        
-        df_grouped = df.groupby(["borough", "month"]).size().reset_index(name="count")
-        df_pivot = df_grouped.pivot(index="borough", columns="month", values="count")
-        
+
+        df_grouped = df.groupby(["major_category", "month"]).size().reset_index(name="count")
+        df_pivot = df_grouped.pivot(index="major_category", columns="month", values="count")
+        df_pivot = df_pivot.div(df_pivot.sum(axis=1), axis=0) * 100
+
         fig = px.imshow(
             df_pivot,
-            title="Crime by Borough and Month",
-            labels={"x": "Month", "y": "Borough", "color": "Number of Crimes"},
-            color_continuous_scale="Cividis",
+            title="Crime by Type and Month (% of Type Total)",
+            labels={"x": "Month", "y": "Crime Type", "color": "% of Crimes"},
+            color_continuous_scale="Viridis",
+        )
+        return fig
+    
+    # Borough v. monthe heatmap
+    @render_plotly
+    def borough_month_heatmap():
+        df = filtered_data()
+        if df.empty:
+            return px.imshow([[]], title="No data available")
+
+        df_grouped = df.groupby(["borough", "month"]).size().reset_index(name="count")
+        df_pivot = df_grouped.pivot(index="borough", columns="month", values="count")
+        df_pivot = df_pivot.div(df_pivot.sum(axis=1), axis=0) * 100
+
+        fig = px.imshow(
+            df_pivot,
+            title="Crime by Borough and Month (% of Borough Total)",
+            labels={"x": "Month", "y": "Borough", "color": "% of Crimes"},
+            color_continuous_scale="Viridis",
+            aspect="auto",
         )
         return fig
 
+    # Reset Filters Button
     @reactive.effect
     @reactive.event(input.reset_filter)
     def reset_filters():
