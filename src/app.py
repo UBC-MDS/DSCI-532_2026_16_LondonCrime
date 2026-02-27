@@ -166,6 +166,24 @@ app_ui = ui.page_fillable(
         ),
     ),
     ),
+    # Asked Claude for a smaller footer with all text evenly spaced for my app, then filled in the ui.tags.span() with the relevant content.
+    ui.tags.footer(
+    ui.tags.hr(style="margin: 0;"),
+    ui.tags.div(
+        ui.tags.div(
+            ui.tags.strong("London Crime Dashboard"),
+            ui.tags.span(" · ", style="opacity: 0.4;"),
+            ui.tags.span("An interactive exploration of crime trends across London boroughs from 2008–2016.", style="opacity: 0.7;"),
+            ui.tags.span(" · ", style="opacity: 0.4;"),
+            ui.tags.span("Authors: Molly Kessler, Yasaman Baher, Justin Mak", style="opacity: 0.7;"),
+            ui.tags.span(" · ", style="opacity: 0.4;"),
+            ui.tags.a("GitHub Repo", href="https://github.com/UBC-MDS/DSCI-532_2026_16_LondonCrime", target="_blank", style="opacity: 0.7;"),
+            ui.tags.span(" · ", style="opacity: 0.4;"),
+            ui.tags.span("Last updated: February 26, 2026", style="opacity: 0.7;"),
+        ),
+        style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; font-size: 0.8rem;",
+    ),
+),
 )
 
 # Code provided by Claude to ensure every plot has the same ordering of colors for the different crime types, created in conjunction with the CRIME_COLORS dictionary and CRIME_CSS.
