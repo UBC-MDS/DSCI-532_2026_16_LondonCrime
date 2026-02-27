@@ -36,15 +36,16 @@ flowchart TD
   FY --> FD
   FR --> FD
 
-  FY --> FN{{common_crime_type}}
   FY --> FL{{total_crimes}}
-  FY --> FK{{crime_rate}}
-  FY --> FZ{{safest_borough}}
-  FY --> FT{{least_safe_borough}}
-  FY --> FJ{{least_common_crime}}
+  FY --> FN{{average_monthly_crimes}}
+  FY --> FK{{min_max_crime_type}}
+  FY --> FZ{{min_max_crime_borough}}
 
-  FD --> O1([safest_borough])
-  FD --> O2([heatmap_totalcrime])
+  FD --> O2([Crime_Type_Heatmap])
+  FD --> O3([Crime_by_Borough_Heatmap])
+  FD --> O4([Stacked_Borough_Crime])
+  FD --> O5([Crime_Type_Bar])
+  FD --> O6([Crime_Trends])
 ```
 
 ### Calculation Details
