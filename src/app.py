@@ -2,7 +2,7 @@ from shiny import App, render, ui, reactive
 import plotly.express as px
 # from ridgeplot import ridgeplot
 # import seaborn as sns
-from shinywidgets import render_plotly, render_widget, output_widget
+from shinywidgets import render_plotly, output_widget
 import pandas as pd
 
 data = pd.read_csv("data/raw/LondonCrimeData.csv")
@@ -16,6 +16,9 @@ CRIME_TYPES = [
     "Drugs",
     "Violence Against the Person",
     "Other Notifiable Offences",
+    "Sexual Offences",
+    "Fraud or Forgery",
+    "Burglary"
 ]
 
 # Asked Claude to generate a color palette dictionary for the 6 crime types
@@ -27,6 +30,9 @@ CRIME_COLORS = {
     "Drugs":                       "#76B7B2",
     "Violence Against the Person": "#59A14F",
     "Other Notifiable Offences":   "#B07AA1",
+    "Sexual Offences":             "#FF9DA7",
+    "Fraud or Forgery":            "#9C755F",
+    "Burglary":                    "#EDC948",
 }
 # CSS block that maps each crime type to its color for value box highlight, obtained from Claude (see above).
 CRIME_CSS = "\n".join(
@@ -41,9 +47,9 @@ app_ui = ui.page_fillable(
     ui.tags.style(f"""
         #total_crimes {{ font-size: 2rem; font-weight: bold; }}
         #crime_rate {{ font-size: 2rem; font-weight: bold; }}
-        #most_common_crime {{ font-size: 2rem; font-weight: bold; }}
-        #lowest_crime_borough {{ font-size: 2rem; font-weight: bold; }}
         #year_label_1, #year_label_2, #year_label_3, #year_label_4 {{ font-size: 0.8rem; opacity: 0.7; }}
+        .crime-value {{ font-size: 1.5rem; font-weight: bold; display: block; }}
+        .crime-label {{ font-size: 0.8rem; opacity: 0.7; display: block; margin-top: 0.5rem; }}
         {CRIME_CSS}
     """),
     # Create sidebar
@@ -99,39 +105,37 @@ app_ui = ui.page_fillable(
         ui.value_box(
             "Total Crimes in London", 
             ui.output_text("year_label_1"), 
-            ui.output_text("total_crimes")
+            ui.tags.div(
+                ui.tags.div(ui.output_text("total_crimes"), class_="crime-value"),
+                ui.tags.span("crimes", style="font-size: 0.8rem; opacity: 0.7;"),
+            ),
             ),
         ui.value_box(
             "Average Monthly Crime Rate in London", 
             ui.output_text("year_label_2"), 
-            ui.output_text("crime_rate")
+            ui.tags.div(
+                ui.tags.div(ui.output_text("crime_rate"), class_="crime-value"),
+                ui.tags.span("crimes per month", style="font-size: 0.8rem; opacity: 0.7;"),
+            ),
             ),
         ui.value_box(
-            "Crime by Type in London",
+            "Max/Min Crime in London - Type",
             ui.output_text("year_label_3"),
             ui.tags.div(
-                ui.tags.div(
-                    ui.tags.span("Most Common: ", style="font-size:0.85rem; opacity:0.7;"),
-                    ui.output_ui("most_common_crime"),
-                ),
-                ui.tags.div(
-                    ui.tags.span("Least Common: ", style="font-size:0.85rem; opacity:0.7;"),
-                    ui.output_ui("least_common_crime"),
-                ),
+                ui.tags.span("Most Common Crime", class_="crime-label"),
+                ui.tags.div(ui.output_ui("most_common_crime"), class_="crime-value"),
+                ui.tags.span("Least Common Crime", class_="crime-label"),
+                ui.tags.div(ui.output_ui("least_common_crime"), class_="crime-value"),
             ),
         ),
         ui.value_box(
-            "Crime by Borough in London",
+            "Max/Min Crime in London - Borough",
             ui.output_text("year_label_4"),
             ui.tags.div(
-                ui.tags.div(
-                    ui.tags.span("Highest: ", style="font-size:0.85rem; opacity:0.7;"),
-                    ui.output_text("highest_crime_borough"),
-                ),
-                ui.tags.div(
-                    ui.tags.span("Lowest: ", style="font-size:0.85rem; opacity:0.7;"),
-                    ui.output_text("lowest_crime_borough"),
-                ),
+                ui.tags.span("Highest Amount of Crime", class_="crime-label"),
+                ui.tags.div(ui.output_text("highest_crime_borough"), class_="crime-value"),
+                ui.tags.span("Lowest Amount of Crime", class_="crime-label"),
+                ui.tags.div(ui.output_text("lowest_crime_borough"), class_="crime-value"),
             ),
         ),
         fill=False,
@@ -139,29 +143,24 @@ app_ui = ui.page_fillable(
     # Plots
     ui.layout_columns(
         ui.card(
-            # ui.card_header("Amount of Crime - Borough Trend Comparison"),
             output_widget("borough_trend"),
             full_screen=True,
         ),
         ui.card(
-            # ui.card_header("Amount of Crime by Type"),
             output_widget("crime_type_counts"),
             full_screen=True,
         ),
         ui.card(
-            # ui.card_header("Amount of Crime - Type Trend Comparison"),
             output_widget("crime_type_trend"),
             full_screen=True,
         ),
     ),
     ui.layout_columns(
         ui.card(
-            # ui.card_header("Crime Heatmap by Borough and Month"),
             output_widget("crime_type_month_heatmap"),     
             full_screen=True,
         ),
         ui.card(
-            # ui.card_header("Recent Incidents"),
             output_widget("borough_month_heatmap"),
             full_screen=True,
         ),
@@ -281,7 +280,7 @@ def server(input, output, session):
     def borough_trend():
         df = filtered_data()
         if df.empty:
-            return px.line(title="No data available")
+            return px.line(title="No data - select a borough")
         
         df_grouped = df.groupby(["borough", "major_category"]).size().reset_index(name="count")
         df_grouped = df_grouped.sort_values("count", ascending=False)
@@ -303,7 +302,7 @@ def server(input, output, session):
     def crime_type_trend():
         df = filtered_data()
         if df.empty:
-            return px.line(title="No data available")
+            return px.line(title="No data - select a borough")
         
         df_grouped = df.groupby(["year", "month", "major_category"]).size().reset_index(name="count")
         df_grouped["date"] = pd.to_datetime(df_grouped[["year", "month"]].assign(day=1))
@@ -324,19 +323,18 @@ def server(input, output, session):
     def crime_type_counts():
         df = filtered_data()
         if df.empty:
-            return px.bar(title="No data available")
+            return px.bar(title="No data - select a borough")
         
-        df_grouped = df.groupby(["year", "major_category"]).size().reset_index(name="count")
-        df_grouped = df_grouped.sort_values(["year", "count"], ascending=[True, True])
+        df_grouped = df.groupby(["major_category"]).size().reset_index(name="count")
+        df_grouped = df_grouped.sort_values(["count"], ascending=[True])
         
         fig = px.bar(
             df_grouped,
-            x="year",
+            x="major_category",
             y="count",
             color="major_category",
-            barmode="group",
-            title="Amount of Crime by Type Per Year",
-            labels={"year": "Year", "count": "Number of Crimes", "major_category": "Crime Type"},
+            title="Amount of Crime by Type",
+            labels={"count": "Number of Crimes", "major_category": "Crime Type"},
             color_discrete_map=CRIME_COLORS,
         )
         return fig
@@ -346,7 +344,7 @@ def server(input, output, session):
     def crime_type_month_heatmap():
         df = filtered_data()
         if df.empty:
-            return px.bar(title="No data available")
+            return px.bar(title="No data - select a borough")
 
         df_grouped = df.groupby(["major_category", "month"]).size().reset_index(name="count")
         df_pivot = df_grouped.pivot(index="major_category", columns="month", values="count")
@@ -355,8 +353,8 @@ def server(input, output, session):
         fig = px.imshow(
             df_pivot,
             title="Crime by Type and Month (% of Type Total)",
-            labels={"x": "Month", "y": "Crime Type", "color": "% of Crimes"},
-            color_continuous_scale="Viridis",
+            labels={"x": "Month", "y": "Crime Type", "color": "% of Type Total"},
+            color_continuous_scale="Viridis_r",
         )
         return fig
     
@@ -365,7 +363,7 @@ def server(input, output, session):
     def borough_month_heatmap():
         df = filtered_data()
         if df.empty:
-            return px.imshow([[]], title="No data available")
+            return px.imshow([[]], title="No data - select a borough")
 
         df_grouped = df.groupby(["borough", "month"]).size().reset_index(name="count")
         df_pivot = df_grouped.pivot(index="borough", columns="month", values="count")
@@ -374,8 +372,8 @@ def server(input, output, session):
         fig = px.imshow(
             df_pivot,
             title="Crime by Borough and Month (% of Borough Total)",
-            labels={"x": "Month", "y": "Borough", "color": "% of Crimes"},
-            color_continuous_scale="Viridis",
+            labels={"x": "Month", "y": "Borough", "color": "% of Borough Total"},
+            color_continuous_scale="Viridis_r",
             aspect="auto",
         )
         return fig
