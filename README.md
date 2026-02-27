@@ -33,7 +33,7 @@ This enables better-informed decisions, such as choosing a neighbourhood to move
 
 Below is a short animated demo of the dashboard in use (loading, filtering, and exploring key views):
 
-![Animated demo of the Crime in London dashboard](img/app_demo.mp4)
+![Animated demo of the Crime in London dashboard](img/demo.mp4)
 
 ---
 
