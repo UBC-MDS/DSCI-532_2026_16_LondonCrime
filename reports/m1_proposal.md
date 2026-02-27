@@ -6,7 +6,7 @@
 
 **Solution:** The *Crime in London* dashboard centralises crime data in one interactive tool. Users can filter by year range and crime type, view key metrics (total crimes, crime rate, most common crime, average response time), and explore trends and patterns via charts. This helps users make informed decisions—whether choosing a borough to live in, selecting a hotel, or corroborating legal arguments.
 
----
+------------------------------------------------------------------------
 
 ## Section 2: Description of the Data
 
@@ -14,7 +14,7 @@
 
 **Relevance:** These variables map directly to user needs. `borough` supports borough-level comparisons for relocation and tourism; `major_category` and `minor_category` enable filtering by crime type (e.g., theft, burglary, violence); `year` and `month` support temporal analysis for trend detection and legal validation; and `value` provides counts for aggregations and rate calculations.
 
----
+------------------------------------------------------------------------
 
 ## Section 3: Research Questions & Usage Scenarios
 
@@ -40,16 +40,18 @@ User Stories:
 
 ## Section 4: Exploratory Data Analysis
 
-#### [Heat Map Visualization:]{.underline}
+EDA performed in the [eda_analysis](https://github.com/UBC-MDS/DSCI-532_2026_16_LondonCrime/blob/main/notebooks/eda_analysis.ipynb) Jupyter notebook, located in the notebooks folder.
+
+#### Heat Map Visualization
 
 -   With the use of the heat map, users can easily hover over their desired borough and check the number or crime rates. This heat map is especially useful for users that are looking for a specific neighborhood/borough and the number of crimes, and the type of crime that took place there. The heat map could be a useful visualization for the lawyer, checking the for the median number of crimes in Barnet.
 
-#### [Line Plot Visualization:]{.underline}
+#### Line Plot Visualization
 
 -   For users wanting to see the safest neighborhoods in London, they could use this line plot to get an understanding of the top 10 safest boroughs in London. With this line plot, the number of crimes over the past several years is shown, giving the user a quick and easy visualization of the potential borough they want to live in.
 
 ## Section 5: App Sketch & Description
 
-- With our dashboard, our team ensured easy access to the most thorough information about crimes taking place in London. We made sure to highlight the most important information, including total crimes, crime rate per 1,000 people, most common type of crime, and the safest borough. With these quick numbers, users can easily get a general understanding of the crimes taking place in London and how they might impact them on a day-to-day basis. Furthermore, we included graphs that showcase these insights in a more comprehensive manner. As seen, we have created dummy graphs that showcase annual crimes, types of crimes and their frequency, along with crime trends over the past several years. We have also included a heat map that showcases each specific borough and the frequency of each crime in that borough. If users wish to select a specific year, crime type, or borough, we have included a global selector at the top of the dashboard that allows them to choose their desired specifications.
+-   With our dashboard, our team ensured easy access to the most thorough information about crimes taking place in London. We made sure to highlight the most important information, including total crimes, crime rate per 1,000 people, most common type of crime, and the safest borough. With these quick numbers, users can easily get a general understanding of the crimes taking place in London and how they might impact them on a day-to-day basis. Furthermore, we included graphs that showcase these insights in a more comprehensive manner. As seen, we have created dummy graphs that showcase annual crimes, types of crimes and their frequency, along with crime trends over the past several years. We have also included a heat map that showcases each specific borough and the frequency of each crime in that borough. If users wish to select a specific year, crime type, or borough, we have included a global selector at the top of the dashboard that allows them to choose their desired specifications.
 
 ![Sketch](../img/sketch.png)
