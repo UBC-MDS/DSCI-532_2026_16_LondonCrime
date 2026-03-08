@@ -62,9 +62,11 @@ CRIME_CSS = "\n".join(
     for i, color in enumerate(CRIME_COLORS.values())
 )
 
-# CSS block that colors the checkbox labels to match crime type colors
+# CSS block that colors the checkbox labels to match crime type colors.
+# ui.input_checkbox_group renders as: #major_category .shiny-options-group > div:nth-child(n) label
 CHECKBOX_CSS = "\n".join(
-    f'#major_category > div:nth-child({i + 1}) label {{ color: {color}; font-weight: 600; }}'
+    f'#major_category .shiny-options-group > div:nth-child({i + 1}) label {{ color: {color}; font-weight: 600; }}\n'
+    f'#major_category .shiny-options-group > div:nth-child({i + 1}) input[type="checkbox"] {{ accent-color: {color}; }}'
     for i, color in enumerate(CRIME_COLORS.values())
 )
 
