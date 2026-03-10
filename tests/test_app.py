@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-from app import filtered_data, filtered_data_year, total_crimes
+from utils import filtered_data, filtered_data_year, total_crimes
 
 @pytest.fixture
 def sample_data():
