@@ -1,6 +1,7 @@
 from pathlib import Path
+import sys
 import os
-
+sys.path.insert(0, str(Path(__file__).parent))
 from dotenv import load_dotenv
 import pandas as pd
 import plotly.express as px
@@ -11,6 +12,7 @@ from shinywidgets import render_plotly, render_widget, output_widget
 
 import ibis
 from ibis import _
+from utils import filtered_data, filtered_data_year, total_crimes
 
 # Parquet path (relative to project root); connection created per-session in server()
 PARQUET_PATH = "data/processed/LondonCrimeData.parquet"
@@ -245,13 +247,13 @@ app_ui = ui.page_navbar(
                 ui.card_header("Filtered Data"),
                 ui.output_data_frame("ai_data_table"),
             ),
-            ui.card(
-                ui.download_button("download_filtered", "Download filtered data"),
-            ),
-            ui.card(
-                ui.card_header("AI query result state"),
-                ui.output_text("ai_filter_state_text"),
-            ),
+            # ui.card(
+            #     ui.download_button("download_filtered", "Download filtered data"),
+            # ),
+            # ui.card(
+            #     ui.card_header("AI query result state"),
+            #     ui.output_text("ai_filter_state_text"),
+            # ),
             ui.layout_columns(
                 ui.card(
                     ui.card_header("Crime by Borough and Type (AI Filtered)"),
