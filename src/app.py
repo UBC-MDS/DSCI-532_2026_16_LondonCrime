@@ -100,6 +100,51 @@ app_ui = ui.page_navbar(
             {CRIME_CSS}
             {CHECKBOX_CSS}
         """),
+        ui.tags.details(
+        ui.tags.summary(
+            "Click to gain insights about our dashboard ✨",
+            style="""
+                list-style: none;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 1.25rem;
+                font-size: 0.95rem;
+                cursor: pointer;
+            """
+        ),
+        ui.tags.div(
+            ui.tags.h1("Exploring Crimes Across London Boroughs, 2008–2016"),
+            ui.tags.p(
+                "This dashboard contains data collected from ",
+                ui.tags.a("data.london.gov.uk", href="https://data.london.gov.uk", target="_blank"),
+                ". It aims to give a quick and thorough overview of crimes taking place in various boroughs across London.",
+            ),
+            ui.tags.p(
+                "Original data can be accessed via this ",
+                ui.tags.a("link to Kaggle", href="https://www.kaggle.com/datasets/LondonDataStore/london-crime/data", target="_blank"),
+                ".",
+            ),
+            ui.tags.h3("Interacting with the dashboard"),
+            ui.tags.ul(
+                ui.tags.li("Use the sidebar to filter by year range, crime type, and borough."),
+                ui.tags.li("The summary boxes show crime statistics for your two selected boroughs alongside London-wide figures."),
+                ui.tags.li("Prefer not to use the filters? Switch to our AI assistant at the top of the dashboard for quick, specific insights instead."),
+            ),
+            ui.tags.h3("Limitations of this dashboard"),
+            ui.tags.ul(
+                ui.tags.li("The dashboard is limited to years 2008 - 2016, and does not have statistics for recent years."),
+                ui.tags.li("Only two boroughs could be selected at once."),
+                ui.tags.li("Default comparison is City of London vs. Croydon across all years and crime types."),
+            ),
+            style="padding: 1rem 1.25rem; border-top: 1px solid #dee2e6;"
+        ),
+        style="""
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        """
+    ),
         ui.layout_sidebar(
             ui.sidebar(
                 # Year Selector
@@ -287,7 +332,7 @@ def server(input, output, session):
     clicked_crime_type = reactive.value(None)
 
     # clean up when user leaves session
-    session.on_ended(con.disconnect)
+    # session.on_ended(con.disconnect)
 
     # ── Filtered data reactives ──────────────────────────────────────────
 
