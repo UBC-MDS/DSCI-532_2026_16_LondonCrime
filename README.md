@@ -31,7 +31,7 @@ This enables better-informed decisions, such as choosing a neighbourhood to move
 
 ### Demo (animated preview)
 
-Below is a short animated demo of the dashboard in use (loading, filtering, and exploring key views):
+Below is a short animated demo of the dashboard in use (loading, filtering, exploring key views, and how to interact with our AI assistant):
 
 ![Animated demo of the Crime in London dashboard](img/londoncrim_demo.gif)
 
