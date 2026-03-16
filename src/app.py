@@ -176,7 +176,7 @@ app_ui = ui.page_navbar(
                     "Select Borough 2:",
                     choices=BOROUGHS,
                     multiple=False,
-                    selected="City of London"
+                    selected="Kingston upon Thames"
                 ),
                 ui.input_action_button("reset_filter", "Restore Defaults"),
                 open="desktop",
@@ -557,7 +557,7 @@ def server(input, output, session):
         ui.update_slider("year_range", value=[2008, 2016])
         ui.update_checkbox_group("major_category", selected=CRIME_TYPES)
         ui.update_selectize("borough_1", selected="Croydon")
-        ui.update_selectize("borough_2", selected="City of London")
+        ui.update_selectize("borough_2", selected="Kingston upon Thames")
         clicked_crime_type.set(None)
 
     @reactive.effect
